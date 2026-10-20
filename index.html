@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Estimate tokens and compare the cost of a prompt across LLM APIs." />
+    <title>LLM Cost Lens</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>LLM Cost Lens</h1>
+        <p class="lede">Paste a prompt, set your traffic, and compare what it costs across models.</p>
+      </header>
+
+      <section class="panel" aria-labelledby="prompt-h">
+        <h2 id="prompt-h">Prompt</h2>
+        <textarea id="prompt" rows="8" placeholder="Paste a system prompt, a document, or a typical user message…"></textarea>
+        <p class="stats" id="stats" aria-live="polite"></p>
+        <div class="grid">
+          <label>Extra input tokens <span class="hint">(history, retrieved context)</span>
+            <input id="extra-input" type="number" min="0" step="100" value="0" />
+          </label>
+          <label>Output tokens per request
+            <input id="output" type="number" min="0" step="50" value="500" />
+          </label>
+          <label>Cached input <span class="hint">(% of input)</span>
+            <input id="cached" type="number" min="0" max="100" step="5" value="0" />
+          </label>
+          <label>Requests per day
+            <input id="rpd" type="number" min="0" step="100" value="1000" />
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="results-h">
+        <h2 id="results-h">Cost comparison</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th scope="col">Model</th><th scope="col">Per request</th><th scope="col">Per month</th><th scope="col" class="bar-col">Relative</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
+            </thead>
+            <tbody id="results"></tbody>
+          </table>
+        </div>
+        <p class="hint">Built-in rows are example price tiers. Add the models you use with prices from each provider's pricing page; months are 30 days.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="add-h">
+        <h2 id="add-h">Add a model</h2>
+        <form id="add-form" class="grid">
+          <label>Name<input name="name" required maxlength="60" /></label>
+          <label>Input $ / 1M tokens<input name="input" type="number" min="0" step="0.01" required /></label>
+          <label>Output $ / 1M tokens<input name="output" type="number" min="0" step="0.01" required /></label>
+          <label>Cached input $ / 1M <span class="hint">(optional)</span><input name="cachedInput" type="number" min="0" step="0.001" /></label>
+          <label>Context window <span class="hint">(optional)</span><input name="contextWindow" type="number" min="1" step="1000" /></label>
+          <div class="actions"><button type="submit">Add model</button></div>
+        </form>
+        <div class="actions">
+          <button type="button" id="export">Export models</button>
+          <label class="button">Import models<input type="file" id="import" accept="application/json" hidden /></label>
+        </div>
+        <p id="message" class="message" role="status"></p>
+      </section>
+
+      <footer>
+        <p>Token counts are estimates; real tokenizers differ by model. Source on <a href="https://github.com/Amineabdessalem/llm-cost-lens">GitHub</a>.</p>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
