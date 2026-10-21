@@ -18,6 +18,8 @@ and compare cost per request and per month across models.
 - **Prompt caching**: set the share of input served from cache; models with a
   cached-input price are billed accordingly
 - **Context-window check** that flags models the request would not fit
+- **Share links** that carry token counts, traffic settings and your models
+  in the URL (never the prompt text), and **CSV export** of the comparison
 - **Your own models**: add prices from your provider's pricing page; they are
   saved in your browser and can be exported and imported as JSON
 
