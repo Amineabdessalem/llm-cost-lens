@@ -81,3 +81,26 @@ describe("parseModels", () => {
     expect(parseModels(JSON.parse(JSON.stringify(EXAMPLE_MODELS)))).toEqual(EXAMPLE_MODELS);
   });
 });
+
+describe("batch discount", () => {
+  const model = { id: "b", name: "B", input: 2, output: 10, cachedInput: 0.2, batchDiscount: 0.5 };
+
+  it("halves every component in batch mode", () => {
+    const usage = { inputTokens: 1_000_000, outputTokens: 1_000_000, cachedFraction: 0.5 };
+    const normal = costFor(model, usage);
+    const batch = costFor(model, { ...usage, batch: true });
+    expect(batch.perRequest).toBeCloseTo(normal.perRequest / 2);
+    expect(batch.cachedInput).toBeCloseTo(0.05);
+  });
+
+  it("bills models without a batch discount at full price", () => {
+    const { batchDiscount: _d, ...plain } = model;
+    const usage = { inputTokens: 1000, outputTokens: 1000 };
+    expect(costFor(plain, { ...usage, batch: true }).perRequest).toBe(costFor(plain, usage).perRequest);
+  });
+
+  it("validates batchDiscount on import", () => {
+    expect(parseModels([{ id: "x", input: 1, output: 1, batchDiscount: 0.25 }])[0]?.batchDiscount).toBe(0.25);
+    expect(() => parseModels([{ id: "x", input: 1, output: 1, batchDiscount: 1.5 }])).toThrow(/between 0 and 1/);
+  });
+});

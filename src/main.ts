@@ -17,6 +17,7 @@ const inputs = {
   output: $<HTMLInputElement>("output"),
   cached: $<HTMLInputElement>("cached"),
   rpd: $<HTMLInputElement>("rpd"),
+  batch: $<HTMLInputElement>("batch"),
 };
 
 const storage = (() => {
@@ -38,6 +39,7 @@ if (shared) {
   inputs.output.value = String(shared.output);
   inputs.cached.value = String(shared.cachedPercent);
   inputs.rpd.value = String(shared.requestsPerDay);
+  inputs.batch.checked = shared.batch ?? false;
   const taken = new Set(models.map((m) => m.id));
   models = [...models, ...shared.customModels.filter((m) => !taken.has(m.id))];
 }
@@ -63,6 +65,7 @@ function usage(): Usage {
     outputTokens: num(inputs.output),
     cachedFraction: num(inputs.cached) / 100,
     requestsPerDay: num(inputs.rpd),
+    batch: inputs.batch.checked,
   };
 }
 
@@ -139,6 +142,7 @@ $<HTMLFormElement>("add-form").addEventListener("submit", (e) => {
         input: Number(data.input),
         output: Number(data.output),
         cachedInput: optional(data.cachedInput),
+        batchDiscount: data.batchDiscount ? Number(data.batchDiscount) / 100 : undefined,
         contextWindow: optional(data.contextWindow),
         custom: true,
       },
@@ -176,6 +180,7 @@ $("share").addEventListener("click", async () => {
     output: num(inputs.output),
     cachedPercent: num(inputs.cached),
     requestsPerDay: num(inputs.rpd),
+    batch: inputs.batch.checked,
     customModels: models.filter((m) => m.custom),
   });
   history.replaceState(null, "", `#${hash}`);

@@ -5,6 +5,8 @@ export interface Usage {
   outputTokens: number;
   /** Share of input tokens served from the prompt cache, 0..1. */
   cachedFraction?: number;
+  /** Send through the batch API, applying each model's batch discount. */
+  batch?: boolean;
   /** Requests per day, used for monthly projections. */
   requestsPerDay?: number;
 }
@@ -35,9 +37,11 @@ export function costFor(model: ModelPrice, usage: Usage): CostBreakdown {
   const cachedShare = model.cachedInput === undefined ? 0 : clamp01(usage.cachedFraction ?? 0);
   const cachedTokens = inputTokens * cachedShare;
 
-  const input = ((inputTokens - cachedTokens) * model.input) / PER_MILLION;
-  const cachedInput = (cachedTokens * (model.cachedInput ?? 0)) / PER_MILLION;
-  const output = (outputTokens * model.output) / PER_MILLION;
+  // Models without a batch discount are billed at full price even in batch mode.
+  const rate = usage.batch ? 1 - clamp01(model.batchDiscount ?? 0) : 1;
+  const input = ((inputTokens - cachedTokens) * model.input * rate) / PER_MILLION;
+  const cachedInput = (cachedTokens * (model.cachedInput ?? 0) * rate) / PER_MILLION;
+  const output = (outputTokens * model.output * rate) / PER_MILLION;
   const perRequest = input + cachedInput + output;
 
   return {

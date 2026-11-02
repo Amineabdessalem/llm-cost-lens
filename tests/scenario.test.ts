@@ -9,6 +9,7 @@ const scenario: Scenario = {
   output: 400,
   cachedPercent: 60,
   requestsPerDay: 25_000,
+  batch: true,
   customModels: [{ id: "mine", name: "Mine — ünïcode", input: 1.5, output: 6, custom: true }],
 };
 
@@ -17,6 +18,10 @@ describe("scenario links", () => {
     const hash = "#" + encodeScenario(scenario);
     expect(hash).toMatch(/^#s=[A-Za-z0-9_-]+$/);
     expect(decodeScenario(hash)).toEqual(scenario);
+  });
+
+  it("leaves batch mode off for links without it", () => {
+    expect(decodeScenario("#" + encodeScenario({ ...scenario, batch: false }))?.batch).toBe(false);
   });
 
   it("returns null for missing or corrupt hashes", () => {

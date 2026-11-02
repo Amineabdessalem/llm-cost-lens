@@ -10,6 +10,7 @@ export interface Scenario {
   output: number;
   cachedPercent: number;
   requestsPerDay: number;
+  batch?: boolean;
   customModels: ModelPrice[];
 }
 
@@ -37,6 +38,7 @@ export function encodeScenario(s: Scenario): string {
     o: s.output,
     c: s.cachedPercent,
     r: s.requestsPerDay,
+    ...(s.batch ? { b: 1 } : {}),
     m: s.customModels.map(({ custom: _custom, ...m }) => m),
   };
   return `s=${toBase64Url(JSON.stringify(payload))}`;
@@ -57,6 +59,7 @@ export function decodeScenario(hash: string): Scenario | null {
       output: n(raw.o),
       cachedPercent: n(raw.c, 100),
       requestsPerDay: n(raw.r),
+      batch: raw.b === 1,
       customModels: parseModels(raw.m ?? []).map((m) => ({ ...m, custom: true })),
     };
   } catch {

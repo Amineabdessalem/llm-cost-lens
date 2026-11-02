@@ -30,11 +30,11 @@ because provider prices change often.
 
 ```json
 [
-  { "id": "my-model", "name": "My model", "input": 3, "output": 15, "cachedInput": 0.3, "contextWindow": 200000 }
+  { "id": "my-model", "name": "My model", "input": 3, "output": 15, "cachedInput": 0.3, "batchDiscount": 0.5, "contextWindow": 200000 }
 ]
 ```
 
-Prices are USD per 1M tokens. `cachedInput` and `contextWindow` are optional.
+Prices are USD per 1M tokens. `cachedInput`, `batchDiscount` (0 to 1, applied when "Batch API" is ticked) and `contextWindow` are optional.
 
 ## Development
 

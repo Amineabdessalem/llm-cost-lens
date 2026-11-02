@@ -16,6 +16,8 @@ export interface ModelPrice {
   output: number;
   /** USD per 1M cached input tokens, when the provider offers prompt caching. */
   cachedInput?: number;
+  /** Discount for the provider's batch (asynchronous) API, 0..1 (0.5 = half price). */
+  batchDiscount?: number;
   /** Maximum context window in tokens, if known. */
   contextWindow?: number;
   /** True for models the user entered rather than the built-in examples. */
@@ -23,9 +25,9 @@ export interface ModelPrice {
 }
 
 export const EXAMPLE_MODELS: readonly ModelPrice[] = [
-  { id: "example-small", name: "Small model (example)", input: 0.25, output: 1.25, cachedInput: 0.03, contextWindow: 200_000 },
-  { id: "example-medium", name: "Medium model (example)", input: 3, output: 15, cachedInput: 0.3, contextWindow: 200_000 },
-  { id: "example-large", name: "Large model (example)", input: 15, output: 75, cachedInput: 1.5, contextWindow: 200_000 },
+  { id: "example-small", name: "Small model (example)", input: 0.25, output: 1.25, cachedInput: 0.03, batchDiscount: 0.5, contextWindow: 200_000 },
+  { id: "example-medium", name: "Medium model (example)", input: 3, output: 15, cachedInput: 0.3, batchDiscount: 0.5, contextWindow: 200_000 },
+  { id: "example-large", name: "Large model (example)", input: 15, output: 75, cachedInput: 1.5, batchDiscount: 0.5, contextWindow: 200_000 },
   { id: "example-open", name: "Self-hosted open model (example)", input: 0.2, output: 0.6, contextWindow: 128_000 },
 ];
 
@@ -57,6 +59,11 @@ export function parseModels(data: unknown): ModelPrice[] {
     const model: ModelPrice = { id, name, input: price("input", true)!, output: price("output", true)! };
     const cached = price("cachedInput", false);
     if (cached !== undefined) model.cachedInput = cached;
+    const batch = price("batchDiscount", false);
+    if (batch !== undefined) {
+      if (batch > 1) throw new PricingError(`model "${id}": "batchDiscount" must be between 0 and 1`);
+      model.batchDiscount = batch;
+    }
     const ctx = price("contextWindow", false);
     if (ctx !== undefined) model.contextWindow = Math.round(ctx);
     if (m.custom === true) model.custom = true;

@@ -30,6 +30,7 @@
           <label>Requests per day
             <input id="rpd" type="number" min="0" step="100" value="1000" />
           </label>
+          <label class="check"><input id="batch" type="checkbox" /> Batch API <span class="hint">(uses each model's batch discount)</span></label>
         </div>
       </section>
 
@@ -57,6 +58,7 @@
           <label>Input $ / 1M tokens<input name="input" type="number" min="0" step="0.01" required /></label>
           <label>Output $ / 1M tokens<input name="output" type="number" min="0" step="0.01" required /></label>
           <label>Cached input $ / 1M <span class="hint">(optional)</span><input name="cachedInput" type="number" min="0" step="0.001" /></label>
+          <label>Batch discount % <span class="hint">(optional)</span><input name="batchDiscount" type="number" min="0" max="100" step="5" /></label>
           <label>Context window <span class="hint">(optional)</span><input name="contextWindow" type="number" min="1" step="1000" /></label>
           <div class="actions"><button type="submit">Add model</button></div>
         </form>
