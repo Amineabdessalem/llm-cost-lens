@@ -17,7 +17,9 @@ and compare cost per request and per month across models.
   output breakdown on hover
 - **Prompt caching**: set the share of input served from cache; models with a
   cached-input price are billed accordingly
-- **Context-window check** that flags models the request would not fit
+- **Agent loops**: set steps per task and tool-result size; each call re-sends the
+  growing context, so cost grows roughly with the square of the step count
+- **Context-window check** that flags models the request (or the last agent step) would not fit
 - **Share links** that carry token counts, traffic settings and your models
   in the URL (never the prompt text), and **CSV export** of the comparison
 - **Your own models**: add prices from your provider's pricing page; they are

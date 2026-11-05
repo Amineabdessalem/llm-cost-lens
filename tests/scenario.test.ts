@@ -10,6 +10,8 @@ const scenario: Scenario = {
   cachedPercent: 60,
   requestsPerDay: 25_000,
   batch: true,
+  steps: 4,
+  toolResultTokens: 800,
   customModels: [{ id: "mine", name: "Mine — ünïcode", input: 1.5, output: 6, custom: true }],
 };
 

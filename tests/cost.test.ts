@@ -104,3 +104,25 @@ describe("batch discount", () => {
     expect(() => parseModels([{ id: "x", input: 1, output: 1, batchDiscount: 1.5 }])).toThrow(/between 0 and 1/);
   });
 });
+
+describe("agent steps", () => {
+  const flat = { id: "f", name: "F", input: 1, output: 2, contextWindow: 10_000 };
+
+  it("re-sends the growing context on every step", () => {
+    // Inputs per call: 1000, 1000+700, 1000+1400 => 5100 input, 3 * 500 output.
+    const c = costFor(flat, { inputTokens: 1000, outputTokens: 500, toolResultTokens: 200, steps: 3 });
+    expect(c.input).toBeCloseTo((5100 * 1) / 1e6);
+    expect(c.output).toBeCloseTo((1500 * 2) / 1e6);
+  });
+
+  it("matches a single call when steps is 1 or missing", () => {
+    const u = { inputTokens: 1234, outputTokens: 321 };
+    expect(costFor(flat, { ...u, steps: 1 })).toEqual(costFor(flat, u));
+  });
+
+  it("checks the context window against the last, largest call", () => {
+    const u = { inputTokens: 4000, outputTokens: 1000, toolResultTokens: 1000 };
+    expect(costFor(flat, { ...u, steps: 3 }).exceedsContext).toBe(false); // 4000+4000+1000
+    expect(costFor(flat, { ...u, steps: 4 }).exceedsContext).toBe(true); // 4000+6000+1000
+  });
+});

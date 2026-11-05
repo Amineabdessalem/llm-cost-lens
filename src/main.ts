@@ -18,6 +18,8 @@ const inputs = {
   cached: $<HTMLInputElement>("cached"),
   rpd: $<HTMLInputElement>("rpd"),
   batch: $<HTMLInputElement>("batch"),
+  steps: $<HTMLInputElement>("steps"),
+  tool: $<HTMLInputElement>("tool"),
 };
 
 const storage = (() => {
@@ -40,6 +42,8 @@ if (shared) {
   inputs.cached.value = String(shared.cachedPercent);
   inputs.rpd.value = String(shared.requestsPerDay);
   inputs.batch.checked = shared.batch ?? false;
+  inputs.steps.value = String(shared.steps ?? 1);
+  inputs.tool.value = String(shared.toolResultTokens ?? 0);
   const taken = new Set(models.map((m) => m.id));
   models = [...models, ...shared.customModels.filter((m) => !taken.has(m.id))];
 }
@@ -66,6 +70,8 @@ function usage(): Usage {
     cachedFraction: num(inputs.cached) / 100,
     requestsPerDay: num(inputs.rpd),
     batch: inputs.batch.checked,
+    steps: Math.max(1, num(inputs.steps)),
+    toolResultTokens: num(inputs.tool),
   };
 }
 
@@ -181,6 +187,8 @@ $("share").addEventListener("click", async () => {
     cachedPercent: num(inputs.cached),
     requestsPerDay: num(inputs.rpd),
     batch: inputs.batch.checked,
+    steps: Math.max(1, num(inputs.steps)),
+    toolResultTokens: num(inputs.tool),
     customModels: models.filter((m) => m.custom),
   });
   history.replaceState(null, "", `#${hash}`);

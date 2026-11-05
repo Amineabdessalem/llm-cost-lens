@@ -5,6 +5,13 @@ export interface Usage {
   outputTokens: number;
   /** Share of input tokens served from the prompt cache, 0..1. */
   cachedFraction?: number;
+  /**
+   * Agent loop: calls per task (default 1). Each call re-sends the context so
+   * far, so call i carries i * (outputTokens + toolResultTokens) extra input.
+   */
+  steps?: number;
+  /** Tokens a tool returns per step and that join the context. */
+  toolResultTokens?: number;
   /** Send through the batch API, applying each model's batch discount. */
   batch?: boolean;
   /** Requests per day, used for monthly projections. */
@@ -16,6 +23,7 @@ export interface CostBreakdown {
   input: number;
   cachedInput: number;
   output: number;
+  /** Cost of one request, or of one whole task when `steps` > 1. */
   perRequest: number;
   perMonth: number;
   /** True when the prompt plus output would not fit the model's context window. */
@@ -30,8 +38,14 @@ function clamp01(x: number): number {
 }
 
 export function costFor(model: ModelPrice, usage: Usage): CostBreakdown {
-  const inputTokens = Math.max(0, usage.inputTokens);
-  const outputTokens = Math.max(0, usage.outputTokens);
+  const steps = Math.max(1, Math.floor(usage.steps ?? 1));
+  const firstInput = Math.max(0, usage.inputTokens);
+  const outputPerStep = Math.max(0, usage.outputTokens);
+  const growth = outputPerStep + Math.max(0, usage.toolResultTokens ?? 0);
+  // Sum over calls of (first input + i * growth), i = 0..steps-1.
+  const inputTokens = steps * firstInput + (growth * steps * (steps - 1)) / 2;
+  const outputTokens = steps * outputPerStep;
+  const lastCallTokens = firstInput + growth * (steps - 1) + outputPerStep;
   // Without a cached price the provider has no caching, so every input
   // token is billed at the normal rate.
   const cachedShare = model.cachedInput === undefined ? 0 : clamp01(usage.cachedFraction ?? 0);
@@ -52,7 +66,7 @@ export function costFor(model: ModelPrice, usage: Usage): CostBreakdown {
     perRequest,
     perMonth: perRequest * Math.max(0, usage.requestsPerDay ?? 0) * DAYS_PER_MONTH,
     exceedsContext:
-      model.contextWindow !== undefined && inputTokens + outputTokens > model.contextWindow,
+      model.contextWindow !== undefined && lastCallTokens > model.contextWindow,
   };
 }
 

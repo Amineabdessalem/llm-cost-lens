@@ -27,6 +27,12 @@
           <label>Cached input <span class="hint">(% of input)</span>
             <input id="cached" type="number" min="0" max="100" step="5" value="0" />
           </label>
+          <label>Agent steps per request <span class="hint">(1 = single call)</span>
+            <input id="steps" type="number" min="1" step="1" value="1" />
+          </label>
+          <label>Tool result tokens per step
+            <input id="tool" type="number" min="0" step="100" value="0" />
+          </label>
           <label>Requests per day
             <input id="rpd" type="number" min="0" step="100" value="1000" />
           </label>
