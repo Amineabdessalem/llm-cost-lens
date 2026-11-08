@@ -20,6 +20,7 @@ and compare cost per request and per month across models.
 - **Agent loops**: set steps per task and tool-result size; each call re-sends the
   growing context, so cost grows roughly with the square of the step count
 - **Context-window check** that flags models the request (or the last agent step) would not fit
+- **Traffic chart** of monthly cost against requests per day for the cheapest models
 - **Share links** that carry token counts, traffic settings and your models
   in the URL (never the prompt text), and **CSV export** of the comparison
 - **Your own models**: add prices from your provider's pricing page; they are
@@ -56,6 +57,7 @@ to GitHub Pages.
 src/tokens.ts    token estimation
 src/pricing.ts   model price types, example tiers, validation
 src/cost.ts      cost math and comparison
+src/chart.ts     SVG chart of monthly cost against traffic
 src/storage.ts   localStorage persistence
 src/main.ts      UI
 ```

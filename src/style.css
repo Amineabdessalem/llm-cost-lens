@@ -94,3 +94,11 @@ footer a { color: var(--accent); }
   .bar-col { display: none; }
   main { padding-top: 20px; }
 }
+
+.chart { margin: 16px 0 0; }
+.chart svg { width: 100%; height: auto; font: 11px system-ui, sans-serif; }
+.chart .grid { stroke: currentColor; stroke-opacity: 0.12; }
+.chart .tick, .chart .axis { fill: currentColor; fill-opacity: 0.7; }
+.chart .now { stroke: currentColor; stroke-opacity: 0.5; stroke-dasharray: 4 4; }
+.chart .series { stroke-width: 2; }
+.chart .label { font-weight: 600; }

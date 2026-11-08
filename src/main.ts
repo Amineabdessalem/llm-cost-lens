@@ -1,4 +1,5 @@
 import "./style.css";
+import { monthlyCostChart } from "./chart";
 import { compare, formatUSD, type Usage } from "./cost";
 import { comparisonToCSV } from "./csv";
 import { EXAMPLE_MODELS, parseModels, PricingError, type ModelPrice } from "./pricing";
@@ -12,6 +13,7 @@ const promptEl = $<HTMLTextAreaElement>("prompt");
 const statsEl = $("stats");
 const resultsEl = $("results");
 const messageEl = $("message");
+const chartEl = $("chart");
 const inputs = {
   extra: $<HTMLInputElement>("extra-input"),
   output: $<HTMLInputElement>("output"),
@@ -79,6 +81,11 @@ function render(): void {
   const rows = compare(models, usage());
   const max = Math.max(...rows.map((r) => r.perRequest), Number.EPSILON);
   const byId = new Map(models.map((m) => [m.id, m]));
+  // Built from numbers and escaped model names only, so it is safe as markup.
+  chartEl.innerHTML = monthlyCostChart(
+    rows.map((r) => ({ name: byId.get(r.modelId)?.name ?? r.modelId, perRequest: r.perRequest })),
+    num(inputs.rpd),
+  );
   resultsEl.replaceChildren(
     ...rows.map((r) => {
       const m = byId.get(r.modelId)!;
