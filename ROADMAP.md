@@ -6,4 +6,4 @@
 - [ ] Optional exact token counts using an in-browser BPE tokenizer
 - [x] Chart of monthly cost against requests per day
 - [x] CSV export of the comparison table
-- [ ] Unit tests for the DOM layer with happy-dom
+- [x] Unit tests for the DOM layer with happy-dom
